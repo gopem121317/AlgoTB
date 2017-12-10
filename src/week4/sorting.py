@@ -8,22 +8,20 @@ import random
 
 def partition3(arr, l, r):
     x = arr[l]  # pivot element
-    print('critical x: %d' % x)
-    j, k = l, 0  # j: final position of pivot element
-                 # k: number of equal elements
+    j, k = l, l  # j: final position of pivot element
+                 # k: final position of last equal element
     for i in range(l+1, r+1):
-        if arr[i] < x:  # same as 2-way partition
+        if arr[i] < x:
             j += 1
-            arr[i], arr[j] = arr[j], arr[i]  # move to the 1st part
+            k += 1
+            # move to the 1st part
+            arr[i], arr[k] = arr[k], arr[i]
+            arr[j], arr[k] = arr[k], arr[j]
         elif arr[i] == x:  # equal element
             k += 1
-            arr[i], arr[j + k] = arr[j + k], arr[i]  # move to the 2nd part
-            print('equal elements swapped: ')
-            print(arr)
+            arr[i], arr[k] = arr[k], arr[i]  # move to the 2nd part
     arr[l], arr[j] = arr[j], arr[l]  # put pivot element to its final position
-    print('partially sorted: ')
-    print(arr)
-    return j, j+k
+    return j, k
 
 
 def partition2(arr, l, r):
@@ -41,13 +39,11 @@ def randomized_quick_sort(arr, l, r):
     if l >= r:
         return
     k = random.randint(l, r)
-    print('random k: %d' % k)
     arr[l], arr[k] = arr[k], arr[l]
     # m = partition2(a, l, r)
-    m1, m2 = partition3(arr, l, r)
-    print('m1, m2: %d, %d' % (m1, m2))
     # randomized_quick_sort(a, l, m - 1)
     # randomized_quick_sort(a, m + 1, r)
+    m1, m2 = partition3(arr, l, r)
     randomized_quick_sort(arr, l, m1 - 1)
     randomized_quick_sort(arr, m2 + 1, r)
 
@@ -60,27 +56,26 @@ def _print_color(s):
 def _stress_test(n_tests=10000):
     import numpy as np
     for _ in range(n_tests):
-        n = 10
-        a = np.random.randint(1, 1000, n).tolist()
+        arr_size = 10
+        test_arr = np.random.randint(1, 1000, arr_size).tolist()
+        # a.extend([99, 99])
         print('Original array: ')
-        print(a)
-        randomized_quick_sort(a, 0, n - 1)
+        print(test_arr)
+        randomized_quick_sort(test_arr, 0, arr_size - 1)
         try:
-            assert a == sorted(a)
+            assert test_arr == sorted(test_arr)
         except AssertionError:
-            _print_color('Sorted array: WRONG!!!')
-            print(a)
+            _print_color('Sorted array: WRONG!!')
+            print(test_arr)
             break
         else:
             print('Sorted array: ')
-            print(a, '\n')
+            print(test_arr, '\n')
 
 
 if __name__ == '__main__':
-    # input = sys.stdin.read()
-    # n, *a = list(map(int, input.split()))
-    a = [716, 883, 84, 353, 281, 873, 716, 590, 731, 229]
-    n = len(a)
+    input = sys.stdin.read()
+    n, *a = list(map(int, input.split()))
     randomized_quick_sort(a, 0, n - 1)
     for x in a:
         print(x, end=' ')
